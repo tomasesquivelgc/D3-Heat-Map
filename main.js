@@ -8,16 +8,15 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
     const maxYear = d3.max(monthlyVariance, d => d.year);
 
     
-d3.select("#container")
-.append("h1")
-.attr("id", "title")
-.text("Title");
+    d3.select("#container")
+      .append("h1")
+      .attr("id", "title")
+      .text("Title");
 
-
-d3.select("#container")
-  .append("h2")
-  .attr("id", "description")
-  .text(`${minYear}-${maxYear}: base temperature ${baseTemp}℃`);
+    d3.select("#container")
+      .append("h2")
+      .attr("id", "description")
+      .text(`${minYear}-${maxYear}: base temperature ${baseTemp}℃`);
 
   });
 
