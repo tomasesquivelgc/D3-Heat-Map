@@ -1,39 +1,37 @@
-const width = 1200;
-const height = 400;
-const padding = 60;
+const margin = { top: 50, right: 50, bottom: 100, left: 80 };
+const width = 1200 - margin.left - margin.right;
+const height = 400 - margin.top - margin.bottom;
 
 fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/global-temperature.json')
   .then(response => response.json())
   .then(data => {
-    console.log(data);
     const baseTemp = data.baseTemperature;
     const monthlyVariance = data.monthlyVariance;
     const minYear = d3.min(monthlyVariance, d => d.year);
     const maxYear = d3.max(monthlyVariance, d => d.year);
+    const container = d3.select("#container");
 
-    
-    d3.select("#container")
-      .append("h1")
+    container.append("h1")
       .attr("id", "title")
       .text("Title");
 
-    d3.select("#container")
-      .append("h2")
+    container.append("h2")
       .attr("id", "description")
       .text(`${minYear}-${maxYear}: base temperature ${baseTemp}℃`);
 
-    const svg = d3.select("#container")
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height);
+    const svg = container.append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      const colorScale = d3.scaleSequential(d3.interpolateRdBu);
+    const colorScale = d3.scaleSequential(d3.interpolateRdBu);
 
-      // Set the domain for the color scale based on your data
-      colorScale.domain([
-        d3.max(monthlyVariance, d => baseTemp + d.variance),
-        d3.min(monthlyVariance, d => baseTemp + d.variance)
-      ]);
+    // Set the domain for the color scale based on your data
+    colorScale.domain([
+      d3.max(monthlyVariance, d => baseTemp + d.variance),
+      d3.min(monthlyVariance, d => baseTemp + d.variance)
+    ]);
 
     // Create and append the heatmap rectangles
     svg.selectAll("rect")
@@ -46,4 +44,25 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
       .attr("height", height / 12)
       .style("fill", d => colorScale(baseTemp + d.variance));
 
+    // Create y-axis
+    const yScale = d3.scaleBand()
+      .domain(d3.range(12))
+      .range([0, height]);
+    svg.append("g")
+      .attr("class", "y-axis")
+      .call(d3.axisLeft(yScale)
+        .tickFormat((d, i) => {
+          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          return monthNames[i];
+        })
+      );
+
+    // Create x-axis
+    const xScale = d3.scaleLinear()
+      .domain([minYear, maxYear])
+      .range([0, width]);
+    svg.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", `translate(0, ${height})`)
+      .call(d3.axisBottom(xScale).tickFormat(d3.format("d")));
   });
