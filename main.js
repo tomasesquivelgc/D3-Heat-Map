@@ -13,17 +13,17 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
 
     container.append("h1")
       .attr("id", "title")
-      .text("Title");
+      .text("Monthly Global Land-Surface Temperature");
 
     container.append("h2")
       .attr("id", "description")
       .text(`${minYear}-${maxYear}: base temperature ${baseTemp}℃`);
 
     const svg = container.append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
     const colorScale = d3.scaleSequential(d3.interpolateRdBu);
 
@@ -42,7 +42,9 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
       .attr("y", d => (d.month - 1) * (height / 12))
       .attr("width", width / (maxYear - minYear))
       .attr("height", height / 12)
-      .style("fill", d => colorScale(baseTemp + d.variance));
+      .style("fill", d => colorScale(baseTemp + d.variance))
+      .on("mouseover", d => showTooltip(d.fromElement.__data__))
+      .on("mouseout", hideTooltip);
 
     // Create y-axis
     const yScale = d3.scaleBand()
@@ -65,4 +67,27 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
       .attr("class", "x-axis")
       .attr("transform", `translate(0, ${height})`)
       .call(d3.axisBottom(xScale).tickFormat(d3.format("d")));
+
+    // Tooltip
+    const tooltip = container.append("div")
+      .attr("id", "tooltip")
+      .style("opacity", 0);
+
+    function showTooltip(d) {
+      tooltip.transition()
+        .duration(100)
+        .style("opacity", 0.9);
+      tooltip.html(
+        `${d.year}-${d3.timeFormat("%B")(new Date(0, d.month - 1))}<br>${(baseTemp + d.variance)}℃<br>${d.variance}℃`
+      )
+        .style("left", `${d3.event.pageX + 10}px`)
+        .style("top", `${d3.event.pageY - 28}px`)
+        .attr("data-year", d.year);
+    }
+
+    function hideTooltip() {
+      tooltip.transition()
+        .duration(500)
+        .style("opacity", 0);
+    }
   });
