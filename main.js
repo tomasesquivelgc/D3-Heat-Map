@@ -43,7 +43,13 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
       .attr("width", width / (maxYear - minYear))
       .attr("height", height / 12)
       .attr("year", d => d.year)
-      .attr("month", d => d.month - 1)
+      .attr("month", function(d) {
+        const months = [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ];
+        return months[d.month - 1];
+      })
       .attr("temp", d => baseTemp + d.variance)
       .style("fill", d => colorScale(baseTemp + d.variance))
       .on("mouseover", mouseover)
@@ -89,7 +95,7 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
     function mousemove(d) {
       let data = d.target.attributes;
       tooltip
-      .html("Year: " + data.year.value + "<br>" + "Month: " + data.month.value + "<br>" + "Temperature: " + parseFloat(data.temp.value).toFixed(2))
+      .html("Year: " + data.year.value + "<br>" + "Month: " + data.month.value + "<br>" + "Temperature: " + parseFloat(data.temp.value).toFixed(2) + "℃")
       .style("left", (data.x.value)/2 + "px")
       .style("top", (data.y.value)/2 + "px")
     }
