@@ -38,6 +38,7 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
       .data(monthlyVariance)
       .enter()
       .append("rect")
+      .attr("class", "cell")
       .attr("x", d => (d.year - minYear) * (width / (maxYear - minYear)))
       .attr("y", d => (d.month - 1) * (height / 12))
       .attr("width", width / (maxYear - minYear))
@@ -61,6 +62,7 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
       .range([0, height]);
     svg.append("g")
       .attr("class", "y-axis")
+      .attr("id", "y-axis")
       .call(d3.axisLeft(yScale)
         .tickFormat((d, i) => {
           const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -74,6 +76,7 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
       .range([0, width]);
     svg.append("g")
       .attr("class", "x-axis")
+      .attr("id", "x-axis")
       .attr("transform", `translate(0, ${height})`)
       .call(d3.axisBottom(xScale).tickFormat(d3.format("d")));
 
@@ -93,11 +96,11 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
     }
 
     function mousemove(d) {
-      let data = d.target.attributes;
+      let datapoint = d.target.attributes;
       tooltip
-      .html("Year: " + data.year.value + "<br>" + "Month: " + data.month.value + "<br>" + "Temperature: " + parseFloat(data.temp.value).toFixed(2) + "℃")
-      .style("left", (data.x.value)/2 + "px")
-      .style("top", (data.y.value)/2 + "px")
+      .html("Year: " + datapoint.year.value + "<br>" + "Month: " + datapoint.month.value + "<br>" + "Temperature: " + parseFloat(datapoint.temp.value).toFixed(2) + "℃")
+      .style("left", (data.x)/2 + "px")
+      .style("top", (data.y)/2 + "px")
     }
 
   });
