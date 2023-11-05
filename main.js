@@ -1,5 +1,5 @@
 const margin = { top: 50, right: 50, bottom: 100, left: 80 };
-const width = 1200 - margin.left - margin.right;
+const width = 1300 - margin.left - margin.right;
 const height = 400 - margin.top - margin.bottom;
 
 fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/global-temperature.json')
@@ -42,9 +42,12 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
       .attr("y", d => (d.month - 1) * (height / 12))
       .attr("width", width / (maxYear - minYear))
       .attr("height", height / 12)
+      .attr("year", d => d.year)
+      .attr("month", d => d.month - 1)
+      .attr("temp", d => baseTemp + d.variance)
       .style("fill", d => colorScale(baseTemp + d.variance))
-      .on("mouseover", d => showTooltip(d.fromElement.__data__))
-      .on("mouseout", hideTooltip);
+      .on("mouseover", mouseover)
+      .on("mousemove", mousemove);
 
     // Create y-axis
     const yScale = d3.scaleBand()
@@ -71,23 +74,24 @@ fetch('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/maste
     // Tooltip
     const tooltip = container.append("div")
       .attr("id", "tooltip")
-      .style("opacity", 0);
+      .style("opacity", 1)
+      .attr("class", "tooltip")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "2px")
+      .style("border-radius", "5px")
+      .style("padding", "5px");
 
-    function showTooltip(d) {
-      tooltip.transition()
-        .duration(100)
-        .style("opacity", 0.9);
-      tooltip.html(
-        `${d.year}-${d3.timeFormat("%B")(new Date(0, d.month - 1))}<br>${(baseTemp + d.variance)}℃<br>${d.variance}℃`
-      )
-        .style("left", `${d3.event.pageX + 10}px`)
-        .style("top", `${d3.event.pageY - 28}px`)
-        .attr("data-year", d.year);
+    var mouseover = function(d) {
+      tooltip.style("opacity", 1)
     }
 
-    function hideTooltip() {
-      tooltip.transition()
-        .duration(500)
-        .style("opacity", 0);
+    function mousemove(d) {
+      let data = d.target.attributes;
+      tooltip
+      .html("Year: " + data.year.value + "<br>" + "Month: " + data.month.value + "<br>" + "Temperature: " + parseFloat(data.temp.value).toFixed(2))
+      .style("left", (data.x.value)/2 + "px")
+      .style("top", (data.y.value)/2 + "px")
     }
+
   });
